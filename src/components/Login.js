@@ -28,14 +28,14 @@ const Login = () => {
     e.preventDefault();
     setLoading(true); // ✅ Start Loader
     try {
-      const res = await axios.post("http://localhost:8080/api/auth/login", formData);
+      const res = await axios.post("https://node-js-boiler-plate.vercel.app/api/auth/login", formData);
       login(res.data.token, res.data.user);
       enqueueSnackbar(res.data.message, { variant: "success", anchorOrigin: { vertical: "top", horizontal: "right" } });
 
       // toast.success(res.data.message); // ✅ Backend ka message show hoga
       // toast.success("Login Successful");
       console.log("Login Message", res.data?.message)
-      navigate("/products");
+      navigate("/dashboard");
     } catch (error) {
       // toast.error(error.response?.data?.message || "Something went wrong");
       // enqueueSnackbar(error.response?.data?.message, { variant: "error" });

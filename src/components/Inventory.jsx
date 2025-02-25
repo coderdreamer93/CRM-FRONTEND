@@ -26,7 +26,7 @@ const Inventory = ({ Toggle }) => {
   const fetchInventory = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:8080/api/v1/inventories/inventories"
+        "https://node-js-boiler-plate.vercel.app/api/v1/inventories/inventories"
       );
       setInventory(response.data);
     } catch (error) {

@@ -12,8 +12,8 @@ const Donut = () => {
         const fetchData = async () => {
             try {
                 // Comment out the actual API calls for now
-                // const salesResponse = await axios.get('http://localhost:8080/api/v1/sales/sales');
-                // const inventoriesResponse = await axios.get('http://localhost:8080/api/v1/inventories/inventories');
+                // const salesResponse = await axios.get('https://node-js-boiler-plate.vercel.app/api/v1/sales/sales');
+                // const inventoriesResponse = await axios.get('https://node-js-boiler-plate.vercel.app/api/v1/inventories/inventories');
 
                 // Use dummy data for now
                 const salesResponse = { data: [10, 20, 30, 40, 50] };

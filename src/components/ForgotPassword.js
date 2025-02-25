@@ -13,7 +13,7 @@ const ForgotPassword = () => {
     // ✅ Step 1: Send OTP
     const sendOtp = async () => {
         try {
-            const res = await axios.post("http://localhost:8080/api/auth/forgot-password", { email });
+            const res = await axios.post("https://node-js-boiler-plate.vercel.app/api/auth/forgot-password", { email });
             enqueueSnackbar(res.data.message, { variant: "success", anchorOrigin: { vertical: "top", horizontal: "right" } });
             setStep(2);
         } catch (error) {
@@ -24,7 +24,7 @@ const ForgotPassword = () => {
     // ✅ Step 2: Verify OTP
     const verifyOtp = async () => {
         try {
-            const res = await axios.post("http://localhost:8080/api/auth/verify-otp", { email, otp });
+            const res = await axios.post("https://node-js-boiler-plate.vercel.app/api/auth/verify-otp", { email, otp });
             enqueueSnackbar(res.data.message, { variant: "success", anchorOrigin: { vertical: "top", horizontal: "right" } });
             setStep(3);
         } catch (error) {
@@ -35,7 +35,7 @@ const ForgotPassword = () => {
     // ✅ Step 3: Reset Password
     const resetPassword = async () => {
         try {
-            const res = await axios.post("http://localhost:8080/api/auth/reset-password", { email, otp, newPassword });
+            const res = await axios.post("https://node-js-boiler-plate.vercel.app/api/auth/reset-password", { email, otp, newPassword });
             enqueueSnackbar(res.data.message, { variant: "success", anchorOrigin: { vertical: "top", horizontal: "right" } });
             navigate("/login"); // ✅ Redirect to login page
         } catch (error) {

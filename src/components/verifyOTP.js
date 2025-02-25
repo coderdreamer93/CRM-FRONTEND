@@ -12,7 +12,7 @@ const VerifyOtp = () => {
 
   const resetPassword = async () => {
     try {
-      await axios.post("http://localhost:8080/api/auth/reset-password", { email, otp, newPassword });
+      await axios.post("https://node-js-boiler-plate.vercel.app/api/auth/reset-password", { email, otp, newPassword });
       toast.success("Password reset successfully");
       navigate("/login"); // ✅ Redirect to login after reset
     } catch (error) {

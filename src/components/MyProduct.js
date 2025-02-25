@@ -7,7 +7,7 @@ const MyProducts = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:8080/api/products/my-products", {
+      .get("https://node-js-boiler-plate.vercel.app/api/products/my-products", {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => setProducts(res.data))

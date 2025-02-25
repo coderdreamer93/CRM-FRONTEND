@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./components/AuthContext"; // Import AuthProvider
 import PrivateRoute from "./components/PrivateRoute";
 import Login from "./components/Login";
@@ -24,14 +24,26 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/forgot-password" element={<ForgotPassword />} /> {/* ✅ Added Route */}
           <Route path="/verify-otp" element={<VerifyOtp />} />  {/* ✅ Added Route */}
-
+           {/* Protected Routes */}
+          <Route
+            path="/dashboard"
+            element={
+              <PrivateRoute>
+                <Dashboard />
+              </PrivateRoute>
+            }
+          />
+            <Route
+            path="/products"
+            element={
+              <PrivateRoute>
+               <Products />
+              </PrivateRoute>
+            }
+          />
           {/* Protected Routes */}
-          <Route element={<PrivateRoute />}>
-            <Route path="/products" element={<Products />} />
-          </Route>
-          <Route element={<PrivateRoute />}>
-            <Route path="/dashboard" element={<Dashboard />} />
-          </Route>
+          {/* Catch-All Route */}
+          <Route path="*" element={<Navigate to="/login" />} />
         </Routes>
       </Router>
     </AuthProvider>

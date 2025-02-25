@@ -18,7 +18,7 @@ const AddProduct = () => {
   // ✅ Fetch User Products
   const fetchProducts = async () => {
     try {
-      const res = await axios.get("http://localhost:8080/api/products/my-products", {
+      const res = await axios.get("https://node-js-boiler-plate.vercel.app/api/products/my-products", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setProducts(res.data); // 👈 Store products in state
@@ -32,7 +32,7 @@ const AddProduct = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:8080/api/products/add", formData, {
+      await axios.post("https://node-js-boiler-plate.vercel.app/api/products/add", formData, {
         headers: { Authorization: `Bearer ${token}` },
       });
       toast.success("Product Added!");
