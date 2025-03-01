@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useState, useContext, useEffect } from "react";
 import { extendTheme } from '@mui/material/styles';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
@@ -9,57 +9,102 @@ import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { PageContainer } from '@toolpad/core/PageContainer';
 import useContacts from '../container/Contact'; // API call hook
-import useLeads from '../container/Leads'; // Import the useLeads hook
+import LeadsComponent from '../container/Leads'; // Import the useLeads hook
 import { Button, Modal, Box, TextField, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
-
-const NAVIGATION = [
-  { kind: 'header', title: 'Main items' },
-  { segment: 'dashboard', title: 'Dashboard', icon: <DashboardIcon /> },
-  { segment: 'orders', title: 'Contact Management', icon: <ShoppingCartIcon /> },
-  { segment: 'leads', title: 'Lead Generation', icon: <BarChartIcon /> }, // Added Lead Generation
-  { kind: 'divider' },
-  { kind: 'header', title: 'Analytics' },
-  {
-    segment: 'reports',
-    title: 'Reports',
-    icon: <BarChartIcon />,
-    children: [
-      { segment: 'sales', title: 'Sales', icon: <DescriptionIcon /> },
-      { segment: 'traffic', title: 'Traffic', icon: <DescriptionIcon /> },
-    ],
-  },
-  { segment: 'integrations', title: 'Integrations', icon: <LayersIcon /> },
-];
+import AuthContext from "./AuthContext";
+import LogoutIcon from '@mui/icons-material/ExitToApp'; // Logout icon
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 
-const demoTheme = extendTheme({
-  colorSchemes: { light: true, dark: true },
-  colorSchemeSelector: 'class',
-  breakpoints: {
-    values: { xs: 0, sm: 600, md: 600, lg: 1200, xl: 1536 },
-  },
-});
-
-function useDemoRouter(initialPath) {
-  const [pathname, setPathname] = React.useState(initialPath);
-  return React.useMemo(() => ({
-    pathname, searchParams: new URLSearchParams(),
-    navigate: (path) => setPathname(String(path)),
-  }), [pathname]);
-}
 
 export default function DashboardLayoutBasic(props) {
-  const { window } = props;
+  const { logout } = useContext(AuthContext); // Logout function
+  const navigate = useNavigate(); // Navigation hook
+  // const router = useDemoRouter('/dashboard'); // ✅ Router pehle initialize karein
   const router = useDemoRouter('/dashboard');
+
+  useEffect(() => {
+    if (router.pathname === '/logout') {
+      handleLogout();
+    }
+  }, [router.pathname]);
+
+  // const handleLogout = () => {
+  //   logout();
+  //   toast.success("Logged out successfully");
+  //   navigate("/login");
+  // };
+
+  // ✅ Logout Function
+  const handleLogout = () => {
+    logout();
+    toast.success("Logged out successfully");
+    navigate("/login");
+  };
+
+  const NAVIGATION = [
+    { kind: 'header', title: 'Main items' },
+    { segment: 'dashboard', title: 'Dashboard', icon: <DashboardIcon /> },
+    { segment: 'orders', title: 'Contact Management', icon: <ShoppingCartIcon /> },
+    { segment: 'leads', title: 'Lead Generation', icon: <BarChartIcon /> }, // Added Lead Generation
+    { kind: 'divider' },
+    { kind: 'header', title: 'Analytics' },
+
+    // 🔹 Logout Option
+    {
+      segment: 'logout', title: 'Logout', icon: <LogoutIcon />, onClick: handleLogout // ✅ Use onClick instead of action
+      // Call logout function on click  
+    },
+
+    {
+      segment: 'reports',
+      title: 'Reports',
+      icon: <BarChartIcon />,
+      children: [
+        { segment: 'sales', title: 'Sales', icon: <DescriptionIcon /> },
+        { segment: 'traffic', title: 'Traffic', icon: <DescriptionIcon /> },
+      ],
+    },
+    { segment: 'integrations', title: 'Integrations', icon: <LayersIcon /> },
+  ];
+
+  // ✅ Handle Logout when user navigates to `/logout`
+  useEffect(() => {
+    if (router.pathname === '/logout') {
+      handleLogout();
+    }
+  }, [router.pathname]);
+  const demoTheme = extendTheme({
+    colorSchemes: { light: true, dark: true },
+    colorSchemeSelector: 'class',
+    breakpoints: {
+      values: { xs: 0, sm: 600, md: 600, lg: 1200, xl: 1536 },
+    },
+  });
+
+  function useDemoRouter(initialPath) {
+    const [pathname, setPathname] = React.useState(initialPath);
+    return React.useMemo(() => ({
+      pathname, searchParams: new URLSearchParams(),
+      navigate: (path) => setPathname(String(path)),
+    }), [pathname]);
+  }
+
+
+  const { window } = props;
+  // const router = useDemoRouter('/dashboard');
   const currentPage = router.pathname;
   const demoWindow = window ? window() : undefined;
   const { contacts, loading, error, addContact } = useContacts();
-  const { LeadsComponent } = useLeads(); // Get the LeadsComponent from useLeads hook
+  // const { LeadsComponent } = useLeads(); // Get the LeadsComponent from useLeads hook
 
   const [open, setOpen] = React.useState(false);
   const [newContact, setNewContact] = React.useState({
     name: '', email: '', phone: '', company: '', interactions: '',
   });
+
+
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -85,10 +130,16 @@ export default function DashboardLayoutBasic(props) {
         <PageContainer>
           {currentPage === '/orders' && (
             <>
-              <Button variant="contained" color="primary" onClick={handleOpen} sx={{ mb: 2 }}>
-                Add Contact
-              </Button>
-
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '16px' }}>
+                <Button variant="contained" color="primary" className='text-white' onClick={handleOpen}>
+                  Add Contact
+                </Button>
+              </div>
+              {/* <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '16px' }}>
+                <Button variant="contained" color="primary" className='text-white' onClick={handleOpen}>
+                  Add Contact
+                </Button>
+              </div> */}
               {loading ? (
                 <p>Loading...</p>
               ) : error ? (
@@ -112,7 +163,9 @@ export default function DashboardLayoutBasic(props) {
                           <TableCell>{contact.email}</TableCell>
                           <TableCell>{contact.phone}</TableCell>
                           <TableCell>{contact.company}</TableCell>
-                          <TableCell>{contact.interactions.join(', ')}</TableCell>
+                          <TableCell>
+                            {contact.interactions}
+                          </TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
