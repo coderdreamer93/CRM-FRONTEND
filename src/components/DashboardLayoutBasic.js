@@ -39,7 +39,7 @@ export default function DashboardLayoutBasic(props) {
   // ✅ Logout Function
   const handleLogout = () => {
     logout();
-    toast.success("Logged out successfully");
+    // toast.success("Logged out successfully");
     navigate("/login");
   };
 
