@@ -10,12 +10,21 @@ import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { PageContainer } from '@toolpad/core/PageContainer';
 import useContacts from '../container/Contact'; // API call hook
 import LeadsComponent from '../container/Leads'; // Import the useLeads hook
-import { Button, Modal, Box, TextField, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
+import {
+  Button, Modal, Box, TextField, Table, TableBody,
+  TableCell, TableContainer, TableHead, TableRow,
+  Paper, IconButton
+} from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 import AuthContext from "./AuthContext";
 import LogoutIcon from '@mui/icons-material/ExitToApp'; // Logout icon
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
+
+const API_URL = "https://crm-backend-4ad5.vercel.app/api/lead/contacts";
 
 
 export default function DashboardLayoutBasic(props) {
@@ -29,6 +38,8 @@ export default function DashboardLayoutBasic(props) {
       handleLogout();
     }
   }, [router.pathname]);
+
+  const token = localStorage.getItem("token");
 
   // const handleLogout = () => {
   //   logout();
@@ -91,19 +102,21 @@ export default function DashboardLayoutBasic(props) {
     }), [pathname]);
   }
 
+  // const [error, setError] = useState(null);
 
   const { window } = props;
   // const router = useDemoRouter('/dashboard');
   const currentPage = router.pathname;
   const demoWindow = window ? window() : undefined;
-  const { contacts, loading, error, addContact } = useContacts();
+  const { contacts, loading, error, addContact, deleteContact, updateContact } = useContacts();
   // const { LeadsComponent } = useLeads(); // Get the LeadsComponent from useLeads hook
 
   const [open, setOpen] = React.useState(false);
   const [newContact, setNewContact] = React.useState({
     name: '', email: '', phone: '', company: '', interactions: '',
   });
-
+  const [editMode, setEditMode] = useState(false);
+  const [currentContactId, setCurrentContactId] = useState(null);
 
 
   const handleOpen = () => setOpen(true);
@@ -116,13 +129,44 @@ export default function DashboardLayoutBasic(props) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await addContact(newContact);
-      setNewContact({ name: '', email: '', phone: '', company: '', interactions: '' });
+      if (editMode) {
+        await updateContact(currentContactId, newContact);
+        toast.success("Contact updated successfully!");
+      } else {
+        await addContact(newContact);
+        toast.success("Contact added successfully!");
+      }
       handleClose();
     } catch (err) {
-      console.error("Error adding contact:", err);
+      console.error("Error saving contact:", err);
     }
   };
+
+  const handleEdit = (contact) => {
+    setNewContact(contact);
+    // setSelectedContact(contact);
+    setEditMode(true);
+    setOpen(true);
+  };
+
+  const handleDelete = async (id) => {
+    if (!token) {
+      // setError("Authentication token missing. Please login again.");
+      return;
+    }
+
+    try {
+      await axios.delete(`${API_URL}/contacts/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      // setContacts(contacts.filter(contact => contact._id !== id));
+      toast.success("Contact deleted successfully!");
+    } catch (err) {
+      // setError(`Failed to delete contact: ${err.response?.data?.message || err.message}`);
+      toast.error("Failed to delete contact.");
+    }
+  };
+
 
   return (
     <AppProvider navigation={NAVIGATION} router={router} theme={demoTheme} window={demoWindow}>
@@ -166,6 +210,14 @@ export default function DashboardLayoutBasic(props) {
                           <TableCell>
                             {contact.interactions}
                           </TableCell>
+                          <TableCell>
+                            <IconButton color="primary" onClick={() => handleEdit(contact)}>
+                              <EditIcon />
+                            </IconButton>
+                            <IconButton color="error" onClick={() => handleDelete(contact._id)}>
+                              <DeleteIcon />
+                            </IconButton>
+                          </TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
@@ -184,7 +236,7 @@ export default function DashboardLayoutBasic(props) {
               transform: 'translate(-50%, -50%)', width: 400,
               bgcolor: 'background.paper', p: 4, borderRadius: 2, boxShadow: 3,
             }}>
-              <h2 id="modal-title">Add New Contact</h2>
+              <h2>{editMode ? "Edit Contact" : "Add New Contact"}</h2>
               <form onSubmit={handleSubmit}>
                 <TextField fullWidth margin="normal" label="Name" name="name" value={newContact.name} onChange={handleChange} required />
                 <TextField fullWidth margin="normal" label="Email" name="email" value={newContact.email} onChange={handleChange} required />
@@ -192,7 +244,7 @@ export default function DashboardLayoutBasic(props) {
                 <TextField fullWidth margin="normal" label="Company" name="company" value={newContact.company} onChange={handleChange} required />
                 <TextField fullWidth margin="normal" label="Interactions (comma separated)" name="interactions" value={newContact.interactions} onChange={handleChange} required />
                 <Button type="submit" variant="contained" color="primary" sx={{ mt: 2 }}>
-                  Save Contact
+                  {editMode ? 'Update Lead' : 'Save Lead'}
                 </Button>
               </form>
             </Box>
